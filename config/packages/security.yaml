@@ -58,7 +58,7 @@ security:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
         #- { path: ^/api/(login|token/refresh), roles: PUBLIC_ACCESS }
         #- { path: ^/token/refresh$, roles: PUBLIC_ACCESS }
-        #- { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/registerAutomatic,       roles: IS_AUTHENTICATED_FULLY }
         #- { path: ^/api/session/test,       roles: IS_AUTHENTICATED_FULLY }
         #- { path: ^/api/register,       roles: ROLE_SUPER_ADMIN }
