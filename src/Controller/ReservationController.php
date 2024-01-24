@@ -1,0 +1,133 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\Reservation;
+use App\Entity\User;
+use App\Entity\Car;
+use App\Repository\ReservationRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class ReservationController extends AbstractController
+{
+    /**
+     * @Route("/api/reservations", name="reservation_create", methods={"POST"})
+     */
+    public function create(Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $startDate = new \DateTime($data['startDate']);
+        $endDate = new \DateTime($data['endDate']);
+
+        $reservation = new Reservation();
+        $reservation->setStartDate($startDate);
+        $reservation->setEndDate($endDate);
+
+        $userRepository = $this->getDoctrine()->getRepository(User::class);
+        $user = $userRepository->find($data['userId']);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+        $reservation->setReservUser($user);
+
+        $carRepository = $this->getDoctrine()->getRepository(Car::class);
+        $car = $carRepository->find($data['carId']);
+        if (!$car) {
+            throw $this->createNotFoundException('Car not found');
+        }
+        $reservation->setReseCar($car);
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($reservation);
+        $entityManager->flush();
+
+        return $this->json($reservation, 201);
+    }
+
+
+    /**
+     * @Route("/api/users/{id}/reservations", name="user_reservations", methods={"GET"})
+     */
+    public function userReservations(int $id): Response
+    {
+        $userRepository = $this->getDoctrine()->getRepository(User::class);
+        $user = $userRepository->find($id);
+        if (!$user) {
+            throw $this->createNotFoundException('User not found');
+        }
+
+        $reservations = $user->getReservations();
+
+        return $this->json($reservations);
+    }
+
+    /**
+     * @Route("/api/reservations/{id}", name="reservation_update", methods={"PUT"})
+     */
+    public function update(int $id, Request $request): Response
+    {
+        $data = json_decode($request->getContent(), true);
+
+        $reservationRepository = $this->getDoctrine()->getRepository(Reservation::class);
+        $reservation = $reservationRepository->find($id);
+        if (!$reservation) {
+            throw $this->createNotFoundException('Reservation not found');
+        }
+
+        if (isset($data['startDate'])) {
+            $startDate = new \DateTime($data['startDate']);
+            $reservation->setStartDate($startDate);
+        }
+
+        if (isset($data['endDate'])) {
+            $endDate = new \DateTime($data['endDate']);
+            $reservation->setEndDate($endDate);
+        }
+
+        if (isset($data['userId'])) {
+            $userRepository = $this->getDoctrine()->getRepository(User::class);
+            $user = $userRepository->find($data['userId']);
+            if (!$user) {
+                throw $this->createNotFoundException('User not found');
+            }
+            $reservation->setReservUser($user);
+        }
+
+        if (isset($data['carId'])) {
+            $carRepository = $this->getDoctrine()->getRepository(Car::class);
+            $car = $carRepository->find($data['carId']);
+            if (!$car) {
+                throw $this->createNotFoundException('Car not found');
+            }
+            $reservation->setReseCar($car);
+        }
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($reservation);
+        $entityManager->flush();
+
+        return $this->json($reservation, 200);
+    }
+
+    /**
+     * @Route("/api/reservations/{id}", name="reservation_delete", methods={"DELETE"})
+     */
+    public function delete(int $id): Response
+    {
+        $reservationRepository = $this->getDoctrine()->getRepository(Reservation::class);
+        $reservation = $reservationRepository->find($id);
+        if (!$reservation) {
+            throw $this->createNotFoundException('Reservation not found');
+        }
+
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($reservation);
+        $entityManager->flush();
+
+        return $this->json(['message' => 'Reservation deleted successfully'], 200);
+    }
+}

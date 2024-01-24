@@ -1,0 +1,9 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+jwt_refresh:
+  path: /token/refresh
+  methods: [POST]
+  
+  controller: gesdinet.jwtrefreshtoken::refresh
+  
