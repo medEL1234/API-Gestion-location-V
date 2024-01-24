@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -18,7 +20,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"read_user"})
+     * @Groups({"read_user", "user"})
      */
     private $id;
 
@@ -65,6 +67,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $userLogin;
     /**
      * @ORM\OneToMany(targetEntity=Reservation::class, mappedBy="reservUser")
+     * @Groups({"user", "user.reservations"})
      * 
      */
     private $reservations;
@@ -74,6 +77,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->status = 1;
         $this->reservations = new ArrayCollection();
+        
 
     }
 
@@ -214,7 +218,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-     /**
+    /**
      * @return Collection<int, Reservation>
      */
     public function getReservations(): Collection

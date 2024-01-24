@@ -4,7 +4,10 @@ namespace App\Entity;
 
 use App\Repository\ReservationRepository;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Serializer\Annotation\Groups;
+use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 /**
  * @ORM\Entity(repositoryClass=ReservationRepository::class)
  */
@@ -29,6 +32,7 @@ class Reservation
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="reservations")
+     * @Groups({"reservation", "user.reservations"})
      */
     private $reservUser;
 
@@ -83,24 +87,24 @@ class Reservation
         return $this;
     }
 
-    public function getReservUser(): ?user
+        public function getReservUser(): ?User
     {
         return $this->reservUser;
     }
 
-    public function setReservUser(?user $reservUser): self
+    public function setReservUser(?User $reservUser): self
     {
         $this->reservUser = $reservUser;
 
         return $this;
     }
 
-    public function getReseCar(): ?car
+    public function getReseCar(): ?Car
     {
         return $this->reseCar;
     }
 
-    public function setReseCar(?car $reseCar): self
+    public function setReseCar(?Car $reseCar): self
     {
         $this->reseCar = $reseCar;
 

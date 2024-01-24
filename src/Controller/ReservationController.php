@@ -6,6 +6,8 @@ use App\Entity\Reservation;
 use App\Entity\User;
 use App\Entity\Car;
 use App\Repository\ReservationRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +15,15 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class ReservationController extends AbstractController
 {
+    private $em;
+    private $entityManager;
+
+    public function __construct(EntityManagerInterface $em, ManagerRegistry $entityManager)
+    {
+        $this->em = $em;
+        $this->entityManager = $entityManager;
+    }
+
     /**
      * @Route("/api/reservations", name="reservation_create", methods={"POST"})
      */
@@ -41,13 +52,11 @@ class ReservationController extends AbstractController
         }
         $reservation->setReseCar($car);
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($reservation);
-        $entityManager->flush();
+        $this->em->persist($reservation);
+        $this->em->flush();
 
         return $this->json($reservation, 201);
     }
-
 
     /**
      * @Route("/api/users/{id}/reservations", name="user_reservations", methods={"GET"})
@@ -106,9 +115,8 @@ class ReservationController extends AbstractController
             $reservation->setReseCar($car);
         }
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->persist($reservation);
-        $entityManager->flush();
+        $this->em->persist($reservation);
+        $this->em->flush();
 
         return $this->json($reservation, 200);
     }
@@ -124,9 +132,8 @@ class ReservationController extends AbstractController
             throw $this->createNotFoundException('Reservation not found');
         }
 
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($reservation);
-        $entityManager->flush();
+        $this->em->remove($reservation);
+        $this->em->flush();
 
         return $this->json(['message' => 'Reservation deleted successfully'], 200);
     }
