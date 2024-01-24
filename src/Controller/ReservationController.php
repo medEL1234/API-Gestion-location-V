@@ -44,6 +44,7 @@ class ReservationController extends AbstractController
             throw $this->createNotFoundException('User not found');
         }
         $reservation->setReservUser($user);
+        
 
         $carRepository = $this->getDoctrine()->getRepository(Car::class);
         $car = $carRepository->find($data['carId']);
@@ -51,11 +52,19 @@ class ReservationController extends AbstractController
             throw $this->createNotFoundException('Car not found');
         }
         $reservation->setReseCar($car);
-
+        
         $this->em->persist($reservation);
         $this->em->flush();
 
-        return $this->json($reservation, 201);
+        $responseData = [
+            'id' => $reservation->getId(),
+            'startDate' => $reservation->getStartDate()->format('Y-m-d H:i:s'),
+            'endDate' => $reservation->getEndDate()->format('Y-m-d H:i:s'),
+            'userId' => $reservation->getReservUser()->getId(),
+            'carId' => $reservation->getReseCar()->getId()
+        ];
+    
+        return $this->json($responseData, 201);
     }
 
     /**
@@ -70,8 +79,20 @@ class ReservationController extends AbstractController
         }
 
         $reservations = $user->getReservations();
+        $responseData = [];
+        foreach ($reservations as $reservation) {
+            $responseData[] = [
+                'id' => $reservation->getId(),
+                'startDate' => $reservation->getStartDate()->format('Y-m-d H:i:s'),
+                'endDate' => $reservation->getEndDate()->format('Y-m-d H:i:s'),
+                'user' => $reservation->getReservUser()->getEmail(),
+                'cars' => $reservation->getReseCar()->getId()
+            ];
+        }
+    
+        return $this->json($responseData, 201);
 
-        return $this->json($reservations);
+        //return $this->json($reservations, 201, [], ['groups' => 'reservation']);
     }
 
     /**
@@ -114,11 +135,22 @@ class ReservationController extends AbstractController
             }
             $reservation->setReseCar($car);
         }
+        //dd($reservation);
 
         $this->em->persist($reservation);
         $this->em->flush();
+        
+        $responseData = [
+            'id' => $reservation->getId(),
+            'startDate' => $reservation->getStartDate()->format('Y-m-d H:i:s'),
+            'endDate' => $reservation->getEndDate()->format('Y-m-d H:i:s'),
+            'userId' => $reservation->getReservUser()->getId(),
+            'carId' => $reservation->getReseCar()->getId()
+        ];
+    
+        
 
-        return $this->json($reservation, 200);
+        return $this->json($responseData, 200);
     }
 
     /**

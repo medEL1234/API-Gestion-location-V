@@ -8,6 +8,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\SerializerInterface;
 /**
  * @ORM\Entity(repositoryClass=ReservationRepository::class)
  */
@@ -22,22 +23,24 @@ class Reservation
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"reservation"})
      */
     private $startDate;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"reservation"})
      */
     private $endDate;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="reservations")
-     * @Groups({"reservation", "user.reservations"})
      */
     private $reservUser;
 
     /**
      * @ORM\ManyToOne(targetEntity=Car::class, inversedBy="reservations")
+     * @Groups({"reservation"})
      */
     private $reseCar;
 
@@ -134,4 +137,5 @@ class Reservation
 
         return $this;
     }
+
 }
