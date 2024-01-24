@@ -9,6 +9,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 /**
@@ -26,7 +28,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=180, unique=true)
-     * @Groups({"read_user"})
+     * @Groups({"read_user","user"})
      */
     private $email;
 
@@ -44,13 +46,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read_user"})
+     * @Groups({"read_user","user"})
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"read_user"})
+     * @Groups({"read_user","user"})
      */
     private $lastName;
 
@@ -67,7 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $userLogin;
     /**
      * @ORM\OneToMany(targetEntity=Reservation::class, mappedBy="reservUser")
-     * @Groups({"user", "user.reservations"})
+     * @Groups({"user"})
      * 
      */
     private $reservations;
@@ -247,4 +249,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
 }
