@@ -9,6 +9,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=ReservationRepository::class)
  */
@@ -24,12 +25,15 @@ class Reservation
     /**
      * @ORM\Column(type="datetime")
      * @Groups({"reservation"})
+     * @Assert\NotBlank
      */
     private $startDate;
 
     /**
      * @ORM\Column(type="datetime")
      * @Groups({"reservation"})
+     * @Assert\NotBlank
+     * @Assert\GreaterThan(propertyPath="startDate", message="End date must be greater than start date")
      */
     private $endDate;
 

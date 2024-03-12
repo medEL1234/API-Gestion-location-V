@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 /**
@@ -29,12 +30,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=180, unique=true)
      * @Groups({"read_user","user"})
+     * @Assert\NotBlank
+     * @Assert\Email
      */
     private $email;
 
     /**
      * @ORM\Column(type="json")
      * @Groups({"read_user"})
+     * 
      */
     private $roles = [];
 
@@ -47,24 +51,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read_user","user"})
+     * @Assert\NotBlank
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"read_user","user"})
+     * @Assert\NotBlank
      */
     private $lastName;
 
     /**
      * @ORM\Column(type="integer")
      * @Groups({"read_user"})
+     * @Assert\NotBlank
      */
     private $status;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      * @Groups({"read_user"})
+     * @Assert\NotBlank
      */
     private $userLogin;
     /**

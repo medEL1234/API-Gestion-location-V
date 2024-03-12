@@ -3,36 +3,28 @@
 namespace App\Controller;
 
 use App\Entity\Car;
-use App\Repository\CarRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Service\CarService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class CarController extends AbstractController
 {
-    private $em;
-    private $entityManager;
+    private $carService;
 
-    public function __construct(EntityManagerInterface $em, ManagerRegistry $entityManager)
+    public function __construct(CarService $carService)
     {
-        $this->em = $em;
-        $this->entityManager = $entityManager;
+        $this->carService = $carService;
     }
 
     /**
      * @Route("/api/cars", name="car_list", methods={"GET"})
      */
-    public function list(CarRepository $carRepository): Response
+    public function list(): Response
     {
-        $cars = $carRepository->findAll();
-        foreach ($cars as $key => $car) {
-            if (!$car->isEnabled() && !empty($car->getReservations())) {
-                unset($cars[$key]);
-            }
-        }
+        $cars = $this->carService->getAllCars();
 
         return $this->json($cars);
     }
@@ -40,7 +32,7 @@ class CarController extends AbstractController
     /**
      * @Route("/api/cars/{id}", name="car_details", methods={"GET"})
      */
-    public function details(Car $car): Response
+    public function details(Car $car): JsonResponse
     {
         return $this->json($car, 200, ['groups' => 'car:read']);
     }
@@ -48,17 +40,11 @@ class CarController extends AbstractController
     /**
      * @Route("/api/cars", name="car_create", methods={"POST"})
      */
-    public function createCar(Request $request): Response
+    public function createCar(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        $car = new Car();
-        $car->setModel($data['model']);
-        $car->setBrand($data['brand']);
-        $car->setYear($data['year']);
-
-        $this->em->persist($car);
-        $this->em->flush();
+        $car = $this->carService->createCar($data);
 
         return $this->json($car, 201);
     }
